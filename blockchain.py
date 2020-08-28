@@ -7,7 +7,7 @@ class BlockChain(object):
 
     def __init__(self):
         self.chain = []
-        self.current_transactions = []
+        self.pending_transactions = []
         self.new_block(previous_hash=1, proof=100)
 
 
@@ -22,9 +22,9 @@ class BlockChain(object):
 
     def valid_proof(self, last_proof, proof):
         """ This function validates the proof """
-        guess = f'{last_proof}{proof}'.encode()
+        guess = '%s%s' % (last_proof, proof)
 
-        guess_hash = hashlib.sha256(guess).hexdigest()
+        guess_hash = hashlib.sha256(guess.encode()).hexdigest()
 
         return guess_hash[:4] == "0000"
 
@@ -35,12 +35,13 @@ class BlockChain(object):
         block = {
             'index': len(self.chain) + 1,
             'timestamp': time.time(),
+            'transactions': self.pending_transactions,
             'proof': proof,
-            previous_hash: previous_hash
+            'previous_hash': previous_hash or self.hash(self.chain[-1])
         }
 
         # Set the current transaction list to emptpy 
-        self.current_transactions = []
+        self.pending_transactions = []
         self.chain.append(block)
 
         return block
@@ -50,7 +51,7 @@ class BlockChain(object):
     def new_transaction(self, sender, recipient, amount):
         """ This funciton adds a new transaction to already existing transactions """
         
-        self.current_transactions.append(
+        self.pending_transactions.append(
             {
                 'sender': sender,
                 'recipient': recipient,

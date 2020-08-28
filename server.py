@@ -23,16 +23,16 @@ def mine():
     # Reward the miner for his contribution. 0 specifies new coin has been mined 
     blockchain.new_transaction(sender="0", recipient=node_indentifier, amount=1)
 
-    # Create the new blok and add it to the chain
+    # Create the new block and add it to the chain
     previous_hash = blockchain.hash(last_block)
     block = blockchain.new_block(proof, previous_hash)
 
     response = {
         'message': 'The new block has been forged',
         'index': block['index'],
-        'transactions': block['transaction'],
+        'transactions': block['transactions'],
         'proof': block['proof'],
-        'prvious_has': block['previous_hash']
+        'previous_hash': block['previous_hash']
     }
 
     return jsonify(response), 200
@@ -52,7 +52,7 @@ def new_transaction():
     index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
 
     response = {
-        'message': f'Transaction is scheduled to be added Block No. {index}'
+        'message': 'Transaction is scheduled to be added Block No. %s' % (index)
     }
 
     return jsonify(response), 201
@@ -61,7 +61,7 @@ def new_transaction():
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
-        'cahin': blockchain.chain,
+        'chain': blockchain.chain,
         'length': len(blockchain.chain)
     }
 
